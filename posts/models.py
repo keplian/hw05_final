@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.db.models.fields.related import ForeignKey
 from django.template.defaultfilters import truncatechars
 
 User = get_user_model()
@@ -88,3 +89,18 @@ class Comment(models.Model):
     )
     text = models.TextField("Comment's text")
     created = models.DateTimeField("Date post was created", auto_now_add=True)
+
+
+class Follow(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="follow user",
+        related_name="follower",
+    )
+    author = ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="follow user",
+        related_name="following",
+    )

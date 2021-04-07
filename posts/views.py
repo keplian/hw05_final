@@ -8,7 +8,7 @@ from django.urls import reverse
 
 from posts.forms import CommentForm, PostForm
 
-from .models import Group, Post
+from .models import Follow, Group, Post
 
 User = get_user_model()
 
@@ -117,3 +117,23 @@ def add_comment(request, post_id, username):
         value.author = author
         value.save()
         return redirect("post", username, post_id)
+
+
+@login_required
+def follow_index(request):
+    # информация о текущем пользователе доступна в переменной request.user
+    #
+    posts = Follow.objects.filter(user=request.user).posts.all()
+    return render(request, "follow.html", {"posts": posts})
+
+
+@login_required
+def profile_follow(request, username):
+    # ...
+    pass
+
+
+@login_required
+def profile_unfollow(request, username):
+    # ...
+    pass
