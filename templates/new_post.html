@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}
+{% if not edit %}Создание нового поста{% else %}Редактирование поста{% endif %}
+{% endblock %}
+{% block content %}
+{% load user_filters %}
+
+<div class="row justify-content-center">
+  <div class="col-md-10 p-5">
+    <div class="card">
+      <div class="card-header">Новый пост</div>
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          {% for field in form %}
+
+          {% for error in field.errors %}
+          <div class="alert alert-danger" role="alert">
+            {{ error }}
+          </div>
+          {% endfor %}
+
+          <div class="form-group row" aria-required={% if field.field.required %}"true"{% else %}"false"{% endif %}>
+            <label for="{{ field.id_for_label }}"
+              class="col-md-4 col-form-label text-md-left">{{ field.label }}{% if field.field.required %}<span
+                class="required">*</span>{% endif %}</label>
+            <div class="col-md-6">
+              {{ field|addclass:"form-control" }}
+              {% if field.help_text %}
+              <small id="{{ field.id_for_label }}-help" class="form-text text-muted">{{ field.help_text|safe }}</small>
+              {% endif %}
+            </div>
+
+          </div>
+
+          {% endfor %}
+
+          <div class="col-md-6 offset-md-4">
+            {% if edit %}
+            <button type="submit" class="btn btn-success">
+              Редактировать пост
+            </button>
+            {% else %}
+            <button type="submit" class="btn btn-success">
+              Сохранить пост
+            </button>
+            {% endif %}
+          </div>
+        </form>
+      </div> <!-- card body -->
+    </div> <!-- card -->
+  </div> <!-- col -->
+</div> <!-- row -->
+{% endblock %}

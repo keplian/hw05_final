@@ -1,0 +1,66 @@
+[
+    {
+        "model": "auth.user",
+        "pk": 1,
+        "fields": {
+            "password": "",
+            "last_login": null,
+            "is_superuser": false,
+            "username": "leo",
+            "first_name": "",
+            "last_name": "",
+            "email": "ln@yasnaya.polyana",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2019-10-05T21:37:36.487Z",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "auth.user",
+        "pk": 4,
+        "fields": {
+            "password": "pbkdf2_sha256$150000$HwUX6xrhIIf2$GPXWI3VNwMgh83j+Tw8EhZjc4l18C8XFbxXgBYrPaaI=",
+            "last_login": "2021-03-28T22:37:42.715Z",
+            "is_superuser": true,
+            "username": "keplian",
+            "first_name": "",
+            "last_name": "",
+            "email": "keplian@gmail.com",
+            "is_staff": true,
+            "is_active": true,
+            "date_joined": "2021-03-28T22:37:20.421Z",
+            "groups": [],
+            "user_permissions": []
+        }
+    },
+    {
+        "model": "posts.group",
+        "pk": 1,
+        "fields": {
+            "title": "Test",
+            "slug": "test-slug",
+            "description": ""
+        }
+    },
+    {
+        "model": "posts.group",
+        "pk": 2,
+        "fields": {
+            "title": "Wrong",
+            "slug": "wrong-slug",
+            "description": ""
+        }
+    },
+    {
+        "model": "posts.post",
+        "pk": 1,
+        "fields": {
+            "text": "Test_post",
+            "pub_date": "1854-03-14T00:00:00Z",
+            "author": 1,
+            "group": 1
+        }
+    }
+]
