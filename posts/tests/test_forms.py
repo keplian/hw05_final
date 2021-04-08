@@ -4,7 +4,6 @@ import tempfile
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
-
 from posts.forms import PostForm
 from posts.models import Comment, Group, Post
 from posts.tests.constants import DATA_FOR_FORM, URLS

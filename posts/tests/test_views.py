@@ -4,7 +4,6 @@ from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.test import Client, TestCase
 from django.urls.base import reverse
-
 from posts.models import Follow, Group, Post
 from posts.tests.constants import URLS
 
