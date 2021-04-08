@@ -4,22 +4,20 @@
 {% block title %} Последние обновления {% endblock %}
 
 {% block content %}
-<div class="container">
+  <div class="container">
+      {% include "include/menu.html" with index=True %}
+      <h1> Последние обновления на сайте</h1>
+      {% cache 20 index_page %}
+        {% for post in page %}
+          {% include "include/post_item.html" with post=post %}
+        {% endfor %}
+      {% endcache %} 
+  </div>
 
-  {% include "include/menu.html" with index=True %}
-
-  <h1> Последние обновления на сайте</h1>
-  {% cache 20 index_page %}
-  {% for post in page %}
-  {% include "include/post_item.html" with post=post %}
-  {% endfor %}
-  {% endcache %} 
-</div>
-
-{% if page.has_other_pages %}
-<div class="container" text-align:center>
-{% include "include/paginator.html" with items=page%}
-</div>
-{% endif %}
+  {% if page.has_other_pages %}
+    <div class="container" text-align:center>
+      {% include "include/paginator.html" with items=page%}
+    </div>
+  {% endif %}
 
 {% endblock %}
