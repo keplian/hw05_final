@@ -3,9 +3,10 @@ import tempfile
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.test import Client, TestCase, override_settings
+from django.test import Client, TestCase
+
 from posts.forms import PostForm
-from posts.models import Group, Post
+from posts.models import Comment, Group, Post
 from posts.tests.constants import DATA_FOR_FORM, URLS
 
 User = get_user_model()
@@ -21,6 +22,7 @@ class TestForm(TestCase):
         cls.group = Group.objects.get(id=1)
         cls.user = User.objects.get(id=1)
         cls.form = PostForm()
+        cls.guest_client = Client()
         cls.authorized_client = Client()
         cls.authorized_client.force_login(TestForm.user)
 
@@ -60,3 +62,23 @@ class TestForm(TestCase):
         )
         post = Post.objects.get(id=1)
         self.assertEqual((post.text, post.group.id), ("Edited text", 2))
+
+    def only_auth_user_add_comment(self):
+        """Check add comment only for authorized user.
+
+        Guest should be redirected
+        Also check comment is saved for post
+        """
+        count_comments = Comment.objects.filter(post__pk=1).count()
+        data = {"text": "Test comment"}
+        response = TestForm.authorized_client.post(
+            URLS["add_comment"], data, follow=True
+        )
+        response_guest = TestForm.guest_client.post(
+            URLS["add_comment"], data, follow=True
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertRedirects(response_guest.status_code)
+        self.assertEqual(
+            Comment.objects.filter(post__pk=1).count(), count_comments + 1
+        )

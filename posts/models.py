@@ -75,6 +75,15 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
+    """Comment for some post.
+
+    Fields:
+        posts (ForeignKey): Bounded post
+        author (ForeignKey): Comment's author
+        text (TextField): Comment's text
+        created (DatetimeField): auto created date and time post's creation
+    """
+
     post = models.ForeignKey(
         Post,
         on_delete=models.CASCADE,
@@ -90,17 +99,29 @@ class Comment(models.Model):
     text = models.TextField("Comment's text")
     created = models.DateTimeField("Date post was created", auto_now_add=True)
 
+    class Meta:
+        verbose_name = "Comments"
+
+    def __str__(self) -> str:
+        return f"{self.author}'s comment to {self.post}"
+
 
 class Follow(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        verbose_name="follow user",
+        verbose_name="follower user",
         related_name="follower",
     )
     author = ForeignKey(
         User,
         on_delete=models.CASCADE,
-        verbose_name="follow user",
+        verbose_name="following author",
         related_name="following",
     )
+
+    class Meta:
+        verbose_name = "Follow"
+
+    def __str__(self) -> str:
+        return f"{self.user} follow {self.author}"

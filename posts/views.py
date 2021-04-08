@@ -45,12 +45,21 @@ def new_post(request):
 
 
 def profile(request, username):
+    following = False
     user = get_object_or_404(User, username=username)
     user_posts = user.posts.all()
     paginator = Paginator(user_posts, settings.PER_PAGE_GROUP)
     page_number = request.GET.get("page")
     page = paginator.get_page(page_number)
-    return render(request, "profile.html", {"author": user, "page": page})
+    if request.user.is_authenticated:
+        following = Follow.objects.filter(
+            user=request.user, author=user
+        ).exists()
+    return render(
+        request,
+        "profile.html",
+        {"author": user, "page": page, "following": following},
+    )
 
 
 def post_view(request, username, post_id):
@@ -82,58 +91,63 @@ def post_edit(request, username, post_id):
             return redirect(
                 "post", username=request.user.username, post_id=post_id
             )
-    return render(request, "new_post.html", {"form": form, "edit": True})
+    return render(
+        request, "new_post.html", {"form": form, "edit": True, "post": post}
+    )
 
 
 def page_not_found(request, exception):
-    # Переменная exception содержит отладочную информацию,
-    # выводить её в шаблон пользователской страницы 404 мы не станем
+    """Show custom 404 page."""
     return render(request, "misc/404.html", {"path": request.path}, status=404)
 
 
 def server_error(request):
+    """Show custom 404 page."""
     return render(request, "misc/500.html", status=500)
 
 
 @login_required
-def create_comment(request, username, post_id):
+def add_comment(request, post_id, username):
+    """Add comment to target post."""
     form = CommentForm(request.POST or None)
     if form.is_valid():
-        post = form.save(commit=False)
-        post.author = request.user
-        post.save()
-        return redirect("index")
-    return render(request, "comments.html", {"form": form})
-
-
-@login_required
-def add_comment(request, post_id, username):
-    form = CommentForm(request.POST)
-    if form.is_valid():
-        post = get_object_or_404(Post, id=post_id)
-        author = get_object_or_404(User, username=username)
-        value = form.save(commit=False)
-        value.post = post
-        value.author = author
-        value.save()
-        return redirect("post", username, post_id)
+        post = get_object_or_404(Post, author__username=username, id=post_id)
+        comment = form.save(commit=False)
+        comment.post = post
+        comment.author = request.user
+        comment.save()
+    return redirect("post", username, post_id)
 
 
 @login_required
 def follow_index(request):
-    # информация о текущем пользователе доступна в переменной request.user
-    #
-    posts = Follow.objects.filter(user=request.user).posts.all()
-    return render(request, "follow.html", {"posts": posts})
+    """Show index page only with posts only by followed author."""
+    following_posts = Post.objects.filter(author__following__user=request.user)
+    paginator = Paginator(following_posts, settings.PER_PAGE_INDEX)
+    page_number = request.GET.get("page")
+    page = paginator.get_page(page_number)
+    return render(
+        request,
+        "follow.html",
+        {"page": page, "paginator": paginator},
+    )
 
 
 @login_required
 def profile_follow(request, username):
-    # ...
-    pass
+    """Make user follower and author following."""
+    author = get_object_or_404(User, username=username)
+    follow_exists = Follow.objects.filter(
+        user=request.user, author=author
+    ).exists()
+    if request.user != author and not follow_exists:
+        Follow.objects.create(user=request.user, author=author)
+    return redirect("profile", username)
 
 
 @login_required
 def profile_unfollow(request, username):
-    # ...
-    pass
+    """Unfollow target author from followeing authors."""
+    author = get_object_or_404(User, username=username)
+    Follow.objects.get(user=request.user, author=author).delete()
+    return redirect("profile", username)

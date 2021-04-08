@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.paginator import Page
 from django.urls.base import reverse
+
 from posts.forms import PostForm
 from posts.models import Group, Post
 
@@ -49,6 +50,28 @@ URLS = {
         "template": "post.html",
         "url": reverse("post", kwargs={"username": "leo", "post_id": 1}),
         "context": {"author": User, "post": Post},
+    },
+    "follow_index": {
+        "template": "follow.html",
+        "url": reverse("follow_index"),
+        "context": {"page": Page},
+    },
+    "profile_follow": {
+        "template": "",
+        "url": reverse("profile_follow", kwargs={"username": "keplian"}),
+        "context": {},
+    },
+    "profile_unfollow": {
+        "template": "",
+        "url": reverse("profile_unfollow", kwargs={"username": "keplian"}),
+        "context": {},
+    },
+    "add_comment": {
+        "template": "",
+        "url": reverse(
+            "add_comment", kwargs={"username": "leo", "post_id": 1}
+        ),
+        "context": {},
     },
 }
 

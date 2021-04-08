@@ -11,7 +11,7 @@
       {% for post in page %}
         {% include "include/post_item.html" %}
       {% endfor %}
-      {% include "include/paginator.html" %}
+      {% include "include/paginator.html" with items=page%}
     </div>
   </div>
   </main>

@@ -21,9 +21,9 @@
         "model": "auth.user",
         "pk": 4,
         "fields": {
-            "password": "pbkdf2_sha256$150000$HwUX6xrhIIf2$GPXWI3VNwMgh83j+Tw8EhZjc4l18C8XFbxXgBYrPaaI=",
+            "password": "",
             "last_login": "2021-03-28T22:37:42.715Z",
-            "is_superuser": true,
+            "is_superuser": false,
             "username": "keplian",
             "first_name": "",
             "last_name": "",
@@ -60,6 +60,16 @@
             "text": "Test_post",
             "pub_date": "1854-03-14T00:00:00Z",
             "author": 1,
+            "group": 1
+        }
+    },
+    {
+        "model": "posts.post",
+        "pk": 2,
+        "fields": {
+            "text": "keplian's post",
+            "pub_date": "1854-03-14T00:00:00Z",
+            "author": 4,
             "group": 1
         }
     }

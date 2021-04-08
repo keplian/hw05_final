@@ -4,7 +4,8 @@ from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.test import Client, TestCase
 from django.urls.base import reverse
-from posts.models import Group, Post
+
+from posts.models import Follow, Group, Post
 from posts.tests.constants import URLS
 
 User = get_user_model()
@@ -35,9 +36,12 @@ class PostPagesTests(TestCase):
     def test_pages_uses_correct_template(self):
         """Testing pages in URLS use correct templates."""
         for values in URLS.values():
-            with self.subTest(url=values["url"]):
-                response = PostPagesTests.authorized_client.get(values["url"])
-                self.assertTemplateUsed(response, values["template"])
+            if values["template"]:
+                with self.subTest(url=values["url"]):
+                    response = PostPagesTests.authorized_client.get(
+                        values["url"]
+                    )
+                    self.assertTemplateUsed(response, values["template"])
 
     def test_home_page_has_correct_amount_posts(self):
         """Index page shows no more than 10 posts."""
@@ -57,13 +61,14 @@ class PostPagesTests(TestCase):
 
     def test_pages_have_correct_context(self):
         """Pages has Post object in context."""
-        for values in URLS.values():
+        for item, values in URLS.items():
             with self.subTest(url=values["url"]):
                 response = PostPagesTests.authorized_client.get(values["url"])
                 for context, context_object in values["context"].items():
-                    self.assertIsInstance(
-                        response.context.get(context), context_object
-                    )
+                    if context_object:
+                        self.assertIsInstance(
+                            response.context.get(context), context_object
+                        )
 
     def test_new_page_has_fields_in_form(self):
         """New post form has expected fields."""
@@ -106,14 +111,50 @@ class PostPagesTests(TestCase):
     def test_cache_is_working_on_index_page(self):
         """Cache 20 sec on index page for posts"""
         response = PostPagesTests.guest_client.get(URLS["index"]["url"])
-        lenght_response_before = response.content
+        content_response_before = response.content
         Post.objects.create(text="test_cache", author=PostPagesTests.user)
         response = PostPagesTests.guest_client.get(URLS["index"]["url"])
-        lenght_response_after = response.content
-        self.assertEqual(lenght_response_before, lenght_response_after)
+        content_after = response.content
+        self.assertEqual(content_response_before, content_after)
         cache.clear()
         response = PostPagesTests.guest_client.get(URLS["index"]["url"])
         lenght_response_after_sleep = response.content
         self.assertNotEqual(
-            lenght_response_before, lenght_response_after_sleep
+            content_response_before, lenght_response_after_sleep
         )
+
+    def test_follower_can_follow_and_unfollow(self):
+        """User can follow and unfollow author.
+
+        Posts by followed author appear in user's follow index page
+        and don't appear in wrong user's follow index page
+        """
+        keplian = User.objects.get(pk=4)
+        new_user = User.objects.create_user("New follower")
+        new_follower = Client()
+        new_follower.force_login(new_user)
+        follow_exists = False
+        PostPagesTests.authorized_client.get(URLS["profile_follow"]["url"])
+        follow_exists = Follow.objects.filter(
+            user=PostPagesTests.user, author=keplian
+        ).first()
+        self.assertIsNotNone(follow_exists)
+        response_new_follower_follow_index = new_follower.get(
+            URLS["follow_index"]["url"]
+        )
+        response_test_user_follow_index = PostPagesTests.authorized_client.get(
+            URLS["follow_index"]["url"]
+        )
+        self.assertIn(
+            Post.objects.get(pk=2),
+            response_test_user_follow_index.context.get("page"),
+        )
+        self.assertNotIn(
+            Post.objects.get(pk=2),
+            response_new_follower_follow_index.context.get("page"),
+        )
+        PostPagesTests.authorized_client.get(URLS["profile_unfollow"]["url"])
+        follow_exists = Follow.objects.filter(
+            user=PostPagesTests.user, author=keplian
+        ).exists()
+        self.assertFalse(follow_exists)

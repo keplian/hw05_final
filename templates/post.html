@@ -4,12 +4,12 @@
 <main role="main" class="container">
   <div class="row">
     <div class="col-md-3 mb-3 mt-1">
-      {% include "include/author_card.html" %}
+      {% include "include/author_card.html" with profile=author %}
     </div>
 
     <div class="col-md-9">
       {% include "include/post_item.html" %}
-      </div>
+      {% include "include/comments.html" %}
     </div>
   </div>
 </main>
