@@ -50,6 +50,28 @@ URLS = {
         "url": reverse("post", kwargs={"username": "leo", "post_id": 1}),
         "context": {"author": User, "post": Post},
     },
+    "follow_index": {
+        "template": "follow.html",
+        "url": reverse("follow_index"),
+        "context": {"page": Page},
+    },
+    "profile_follow": {
+        "template": "",
+        "url": reverse("profile_follow", kwargs={"username": "keplian"}),
+        "context": {},
+    },
+    "profile_unfollow": {
+        "template": "",
+        "url": reverse("profile_unfollow", kwargs={"username": "keplian"}),
+        "context": {},
+    },
+    "add_comment": {
+        "template": "",
+        "url": reverse(
+            "add_comment", kwargs={"username": "leo", "post_id": 1}
+        ),
+        "context": {},
+    },
 }
 
 DATA_FOR_FORM = {"text": "Form test text", "group": 1, "image": UPLOADED_IMAGE}
