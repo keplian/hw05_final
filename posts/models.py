@@ -107,6 +107,8 @@ class Comment(models.Model):
 
 
 class Follow(models.Model):
+    """User can follow author."""
+
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -122,6 +124,11 @@ class Follow(models.Model):
 
     class Meta:
         verbose_name = "Follow"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "author"], name="unique_follow"
+            )
+        ]
 
     def __str__(self) -> str:
         return f"{self.user} follow {self.author}"
