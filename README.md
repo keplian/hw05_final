@@ -37,4 +37,4 @@ python manage.py runserver
 ```bash
 python manage.py test -v2
 ```
-Всего написано 27 тестов, они расположены в папке: ```./posts/tests/```
+Всего написано 56 тестов, они расположены в папке: ```./posts/tests/```
